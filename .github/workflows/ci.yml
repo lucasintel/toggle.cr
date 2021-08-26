@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  CI: true
+
+jobs:
+  Linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: oprypin/install-crystal@v1
+        with:
+          crystal: latest
+      - run: shards install
+      - run: crystal tool format --check
+      - run: ./bin/ameba
+
+  Specs:
+    needs: [Linter]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crystal: [0.36.1, 1.0.0, latest]
+
+    services:
+      redis:
+        image: redis:6
+        ports: ['6379:6379']
+        options: >-
+          --entrypoint redis-server
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: oprypin/install-crystal@v1
+        with:
+          crystal: ${{ matrix.crystal }}
+      - run: shards install
+      - run: crystal spec
