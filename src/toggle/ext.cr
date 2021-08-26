@@ -5,12 +5,8 @@ module Toggle
   macro finished
     {% for method in @type.methods %}
       {% if method.annotation(RequireInstance) %}
-        {% if method.return_type %}
-          def {{method.name}}({{method.args.join(", ").id}}) : {{method.return_type}}
-        {% else %}
-          def {{method.name}}({{method.args.join(", ").id}})
-        {% end %}
-          raise Toggle::NotInitializedError.new if {{method.args.last.name.id}}.nil?
+        def {{method.name}}({{method.args.join(", ").id}}) {% if method.return_type %} : {{method.return_type}} {% end %}
+          raise Toggle::NotInitializedError.new if instance.nil?
           {{method.body}}
         end
       {% end %}
