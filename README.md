@@ -63,6 +63,11 @@ tenant1.enable("store::new_checkout")
 
 tenant1.enabled?("store::new_checkout") # => true
 tenant2.enabled?("store::new_checkout") # => false
+
+# Or:
+
+Toggle.enabled?(tenant1, "store::new_checkout") # => true
+Toggle.enabled?(tenant2, "store::new_checkout") # => false
 ```
 
 ### Backend
@@ -75,7 +80,7 @@ require "redis"
 require "toggle"
 require "toggle/backend/redis"
 
-backend = Toggle::Backend::Redis.new(redis: redis, keyspace: "_tenant1_toggles")
+backend = Toggle::Backend::Redis.new(redis: redis, keyspace: "_app_toggles")
 ```
 
 Features are stored in a HASH on Redis.
@@ -97,7 +102,7 @@ You can create your own backend using the `Toggle::Backend::Base` interface.
 
 ## Contributing
 
-1. Fork it (<https://github.com/kandayo/togglecr/fork>)
+1. Fork it (<https://github.com/kandayo/toggle.cr/fork>)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
