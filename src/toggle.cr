@@ -1,40 +1,39 @@
 require "./toggle/*"
 
 module Toggle
-  class_property instance : Toggle::Instance?
   extend self
+  class_property instance : Toggle::Instance?
 
-  def init(backend)
+  def init(backend : Toggle::Backend::Base)
     self.instance = Toggle::Instance.new(backend: backend)
   end
 
-  @[RequireInstance]
-  def enabled?(feature, instance = Toggle.instance)
-    instance.enabled?(feature)
+  def enabled?(feature : String, instance = Toggle.instance)
+    with_instance(instance, &.enabled?(feature))
   end
 
-  @[RequireInstance]
-  def disabled?(feature, instance = Toggle.instance)
-    instance.disabled?(feature)
+  def disabled?(feature : String, instance = Toggle.instance)
+    with_instance(instance, &.disabled?(feature))
   end
 
-  @[RequireInstance]
   def features(instance = Toggle.instance)
-    instance.features
+    with_instance(instance, &.features)
   end
 
-  @[RequireInstance]
-  def enable(feature, instance = Toggle.instance)
-    instance.enable(feature)
+  def enable(feature : String, instance = Toggle.instance)
+    with_instance(instance, &.enable(feature))
   end
 
-  @[RequireInstance]
-  def disable(feature, instance = Toggle.instance)
-    instance.disable(feature)
+  def disable(feature : String, instance = Toggle.instance)
+    with_instance(instance, &.disable(feature))
   end
 
-  @[RequireInstance]
   def clear(instance = Toggle.instance)
-    instance.clear
+    with_instance(instance, &.clear)
+  end
+
+  private def with_instance(instance)
+    raise Toggle::NotInitializedError.new if instance.nil?
+    yield instance
   end
 end
